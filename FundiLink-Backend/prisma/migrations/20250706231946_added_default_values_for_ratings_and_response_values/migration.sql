@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "fundis_table" ALTER COLUMN "rating" SET DEFAULT 0,
+ALTER COLUMN "reviews" SET DEFAULT 0,
+ALTER COLUMN "hourlyRate" SET DEFAULT 0,
+ALTER COLUMN "responseTime" SET DEFAULT 0,
+ALTER COLUMN "documents" SET DEFAULT ARRAY[]::TEXT[];

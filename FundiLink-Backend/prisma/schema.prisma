@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String        @id @default(uuid())
+  name           String
+  email          String        @unique
+  password       String
+  phone          String
+  agreeToTerms   Boolean       @default(false)
+  role           String        @default("USER") //  USER, ADMIN, SUPERADMIN
+  verified       String        @default("UNVERIFIED") // UNVERIFIED,PENDING, VERIFIED, SUSPENDED
+  fundiProfile   FundiProfile?
+  fundiProfileId String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("users_table")
+}
+
+model FundiProfile {
+  id            String    @id @default(uuid())
+  rating        Float?    @default(0)
+  reviews       Int?      @default(0)
+  hourlyRate    Float?    @default(0) // e.g. 1500
+  image         String?
+  location      Location? @relation(fields: [locationId], references: [id])
+  responseTime  Float?    @default(0)
+  badge         String?
+  status        String    @default("PENDING") // UNVERIFIED,PENDING, VERIFIED, SUSPENDED, REJECTED
+  earnings      Float?    @default(0)
+  completedJobs Int?      @default(0)
+  appliedDate   DateTime? // when applied to become fundi
+  documents     String[]  @default([]) // e.g ["ID Copy","Certificate"]
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String    @unique
+  service       Service   @relation(fields: [serviceId], references: [id])
+  serviceId     String
+  locationId    String?
+
+  @@map("fundis_table")
+}
+
+model Service {
+  id        String   @id @default(uuid())
+  name      String // Category,Carpentry
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fundiProfiles FundiProfile[]
+
+  @@map("services_table")
+}
+
+model Location {
+  id           String         @id @default(uuid())
+  name         String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  FundiProfile FundiProfile[]
+
+  @@map("locations_table")
+}
